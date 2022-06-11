@@ -8,7 +8,7 @@ class Luzes():
         self.__historico = []
     
     def __str__(self):
-        v = [' ', '@']
+        v = ['  ', '▓▓']
         s = ''
         for linha in self.__matriz:
             s = s + '|'
@@ -16,6 +16,16 @@ class Luzes():
                 s = s + v[celula]
             s = s + '|\n'
         return s
+    
+    def __repr__(self):
+        s = ''
+        for linha in self.__matriz:
+            for valor in linha:
+                s = s + ('0' if valor == 0 else '1')
+        return s
+    
+    def __hash__(self):
+        return int(repr(self), 2)
     
     def __gerarMatriz(self):
         m = []
@@ -82,7 +92,7 @@ class Luzes():
         return self.__matriz
     @matriz.setter
     def matriz(self, matriz):
-        self.__matriz = matriz
+        self.__matriz = [linha[:] for linha in matriz]
         self.__altura = len(matriz)
         self.__altura = len(matriz[0])
     
@@ -97,6 +107,14 @@ class Luzes():
     @property
     def tamHistorico(self):
         return len(self.__historico)
+    
+    def hashToMatriz(self, hash):
+        tam = self.largura * self.altura
+        d = (lambda x , n: format(x,'b').zfill(n))( hash, tam)
+        for i in range(tam):
+            x = i % self.largura
+            y = int(i / self.largura)
+            self.__matriz[y][x] = int(d[i])        
     
     def clicar(self, posicao):
         self.__inserirHistorico(posicao)
@@ -113,4 +131,6 @@ class Luzes():
             concluiu, movimentos = self.__resolver(maximo,[])
         print(concluiu)
         print(movimentos)
+    
+
         
