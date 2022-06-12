@@ -1,188 +1,44 @@
-from luzes import Luzes
-from random import randint
-from matriz_resolver import MatrizResolver
 import json
+from luzes import Luzes
 from os.path import isfile
+from random import randint
+from luzes_movimento_repository import LuzesMovimentoRepository
+from luzes_movimento import LuzesMovimento
+from matriz_resolver import MatrizResolver
+from matriz_solucao import MatrizSolucao
 largura = 5
 altura = 5
+nome_arquivo = "luzes.db"
+lr = LuzesMovimentoRepository(nome_arquivo)   
 
-nome_arquivo = "db.json"
+def aprender():    
+    global largura, altura, lr
+    rm: MatrizResolver = MatrizResolver(largura, altura, lr)
+    for i in range(10):
+        print("Nível: %d" % (i + 1))
+        rm.aprender()
 
-l = Luzes(largura, altura)
-matrizes ={
-    0:[
-        [0,0,0,0,1],
-        [0,0,0,1,1],
-        [0,0,0,0,1],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-    ],
-    1:[
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [1,0,0,0,1],
-        [1,1,0,1,1],
-    ],
-    2:[
-        [1,1,0,1,1],
-        [0,1,1,1,0],
-        [0,1,1,1,0],
-        [0,0,1,0,0],
-        [0,0,0,0,0],
-    ],
-    3:[
-        [0,1,0,0,0],
-        [1,1,0,0,0],
-        [0,1,1,1,0],
-        [1,1,0,0,0],
-        [0,1,0,0,0],
-    ],
-    4:[
-        [1,0,0,0,1],
-        [0,1,0,1,0],
-        [0,1,0,1,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-    ],
-    5:[
-        [1,1,1,0,0],
-        [1,1,1,0,0],
-        [1,0,1,1,0],
-        [1,1,1,0,0],
-        [1,1,1,0,0],
-    ],
-    6:[
-        [1,1,0,0,0],
-        [0,0,1,1,0],
-        [0,0,1,0,0],
-        [0,1,0,1,0],
-        [1,1,0,1,1],
-    ],
-    7:[
-        [1,0,0,0,1],
-        [1,0,0,0,1],
-        [0,1,1,1,0],
-        [0,0,1,0,0],
-        [0,0,1,0,0],
-    ],
-    8:[
-        [1,0,0,1,1],
-        [0,1,1,1,1],
-        [0,0,0,0,1],
-        [0,0,1,1,0],
-        [0,1,0,0,1],
-    ],
-    9:[
-        [0,0,0,0,0],
-        [0,1,1,1,0],
-        [0,0,1,0,0],
-        [1,0,1,0,1],
-        [1,0,0,0,1],
-    ],
-    10:[
-        [1,0,0,0,1],
-        [0,1,0,1,0],
-        [0,1,0,1,0],
-        [0,1,0,0,0],
-        [1,1,1,0,0],
-    ],
-    11:[
-        [1,0,1,0,1],
-        [1,1,1,0,1],
-        [1,1,0,1,0],
-        [1,0,1,0,0],
-        [1,0,1,0,0],
-    ],
-    12:[
-        [1,1,1,1,0],
-        [0,0,1,0,1],
-        [1,0,0,0,1],
-        [1,0,1,0,0],
-        [0,1,1,1,1],
-    ],
-    13:[
-        [0,1,0,1,0],
-        [1,0,0,0,1],
-        [1,1,0,1,1],
-        [1,0,0,0,1],
-        [0,1,0,1,0],
-    ],
-    14:[
-        [1,1,0,0,1],
-        [1,1,1,1,0],
-        [0,0,0,0,0],
-        [1,1,1,1,0],
-        [1,1,0,0,1],
-    ],
-    15:[
-        [1,1,0,1,1],
-        [0,0,0,0,0],
-        [1,0,0,0,1],
-        [1,1,0,1,1],
-        [0,1,0,1,0],
-    ],
-    16:[
-        [1,0,0,0,1],
-        [1,0,0,0,1],
-        [0,1,0,1,0],
-        [0,0,0,0,0],
-        [1,1,0,1,1],
-    ],
-    100:[
-        [0,0,1,1,0],
-        [0,1,1,0,0],
-        [0,0,0,0,0],
-        [0,1,1,0,0],
-        [0,0,1,1,0],
-    ],
-    101:[
-        [0,1,1,1,0],
-        [1,0,1,0,1],
-        [1,1,1,0,0],
-        [1,0,1,0,1],
-        [0,1,1,1,0],
-    ],
-    102:[
-        [1,1,0,1,1],
-        [0,0,1,0,0],
-        [1,1,0,0,0],
-        [0,0,1,0,0],
-        [1,1,0,1,1],
-    ]
-}
-mr = MatrizResolver(largura, altura)
+def resolver():
+    global largura, altura, lr
+    ms = MatrizSolucao(lr)
+    l = Luzes(largura, altura)
+    with open('desafios.json') as arq:
+        dados = json.load(arq)
+        for i, d in dados.items():
+            print("Desafio {}.".format(i))
+            l.matriz = d            
+            solucao = ms.solucao(l)
+            print(l)
+            for s in solucao:
+                l.clicar(s)
+            if hash(l) != 0 :
+                print("Falhou!!!")
+                print(l)
+            print(solucao)
+            print("-"*50)
 
-def abrir():
-    global mr, nome_arquivo
-    if not isfile(nome_arquivo):
-        return
-    with open(nome_arquivo) as f:
-        d = json.load(f)
-        for k, v in d.items():
-            mr.dados[int(k)] = v 
-
-def aprender():
-    global l, mr, nome_arquivo    
-    for i in range(100):
-        mr.aprender()
-        with open(nome_arquivo,"w") as a:
-            json.dump(mr.dados, a)
-        print(len(mr.dados))        
-
-def main():
-    global l, mr, matrizes
-    abrir()
-    for n, matriz in matrizes.items():
-        l.matriz = matriz
-        s = mr.solucao(l)
-        print(n)
-        print(l)
-        for m in s:
-            l.clicar(m)
-        print(l)
-        print(s)        
-    # aprender()    
+def main():    
+    resolver()    
 
 if __name__ == "__main__":
     main()
